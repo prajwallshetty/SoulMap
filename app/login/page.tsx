@@ -28,9 +28,16 @@ function LoginForm() {
       if (err === "CredentialsSignin") {
         setError("Invalid email or password. Please try again.");
       } else if (err === "OAuthSignin") {
-        setError("Failed to sign in with Google. Please try again.");
+        setError("Failed to sign in with Google. Please verify that your Google Client ID and Client Secret are correct.");
+      } else if (err === "AccessDenied") {
+        setError("Access denied. This usually means your database connection failed during login, or your Google OAuth credentials are misconfigured. Please check server logs.");
+      } else if (err === "OAuthEmailMissing") {
+        setError("Sign in failed because your Google account does not have a verified email address associated with it.");
+      } else if (err === "OAuthDbError") {
+        const details = searchParams?.get("message") || "Database connection or write error";
+        setError(`Database Error: ${details}. Please ensure you have set MONGODB_URI in your Vercel Environment Variables and configured your MongoDB Atlas Network Access (IP Access List) to allow access from anywhere (0.0.0.0/0).`);
       } else {
-        setError("An authentication error occurred. Please try again.");
+        setError(`An authentication error occurred (${err}). Please try again.`);
       }
     }
   }, [searchParams]);

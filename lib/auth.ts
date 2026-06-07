@@ -54,22 +54,27 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async signIn({ user, account }) {
       if (account?.provider === "google") {
+        if (!user.email) {
+          return "/login?error=OAuthEmailMissing";
+        }
         try {
           await dbConnect();
-          const existingUser = await User.findOne({ email: user.email?.toLowerCase() });
+          const emailLower = user.email.toLowerCase();
+          const existingUser = await User.findOne({ email: emailLower });
           
           if (!existingUser) {
             // Create user in database for Google sign-in
             await User.create({
-              name: user.name,
-              email: user.email?.toLowerCase(),
+              name: user.name || "Google User",
+              email: emailLower,
               image: user.image || "",
             });
           }
           return true;
-        } catch (error) {
+        } catch (error: any) {
           console.error("Error saving Google user to DB:", error);
-          return false;
+          const errorMessage = error?.message || "Unknown database error";
+          return `/login?error=OAuthDbError&message=${encodeURIComponent(errorMessage)}`;
         }
       }
       return true;
@@ -104,4 +109,5 @@ export const authOptions: NextAuthOptions = {
     error: "/login",
   },
   secret: process.env.NEXTAUTH_SECRET,
+  debug: true,
 };
