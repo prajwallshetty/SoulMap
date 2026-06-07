@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { dbConnect } from "@/lib/mongodb";
 import Report from "@/models/Report";
 import { astrologyService } from "@/lib/astrology";
+import { logActivity } from "@/lib/audit";
 
 // GET all reports for the current user (only returns metadata to speed up listing)
 export async function GET() {
@@ -83,6 +84,15 @@ export async function POST(req: Request) {
       birthTime,
       birthPlace,
       generatedReport,
+    });
+
+    // Write audit log
+    await logActivity({
+      userId: session.user.id,
+      userEmail: session.user.email || "",
+      action: "report.generate",
+      details: `Generated new birth chart report for ${fullName} (${dob} ${birthTime} @ ${birthPlace})`,
+      req,
     });
 
     return NextResponse.json(

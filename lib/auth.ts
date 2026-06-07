@@ -4,6 +4,7 @@ import GoogleProvider from "next-auth/providers/google";
 import bcrypt from "bcryptjs";
 import { dbConnect } from "./mongodb";
 import User from "../models/User";
+import { logActivity } from "./audit";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -35,14 +36,30 @@ export const authOptions: NextAuthOptions = {
         );
 
         if (!isPasswordMatch) {
+          // Log failed login
+          await logActivity({
+            userId: user._id.toString(),
+            userEmail: user.email,
+            action: "user.login_failed",
+            details: "Credentials sign-in: Incorrect password attempt",
+          });
           throw new Error("Incorrect password");
         }
+
+        // Log successful login
+        await logActivity({
+          userId: user._id.toString(),
+          userEmail: user.email,
+          action: "user.login",
+          details: "Credentials sign-in: Successful login",
+        });
 
         return {
           id: user._id.toString(),
           name: user.name,
           email: user.email,
           image: user.image || "",
+          role: user.role || "user",
         };
       },
     }),
@@ -64,10 +81,26 @@ export const authOptions: NextAuthOptions = {
           
           if (!existingUser) {
             // Create user in database for Google sign-in
-            await User.create({
+            const newUser = await User.create({
               name: user.name || "Google User",
               email: emailLower,
               image: user.image || "",
+              role: "user", // Default role
+            });
+            // Log Google registration
+            await logActivity({
+              userId: newUser._id.toString(),
+              userEmail: emailLower,
+              action: "user.register",
+              details: "Google sign-in: Registered new user",
+            });
+          } else {
+            // Log Google login
+            await logActivity({
+              userId: existingUser._id.toString(),
+              userEmail: emailLower,
+              action: "user.login",
+              details: "Google sign-in: Successful login",
             });
           }
           return true;
@@ -82,17 +115,17 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-      }
-      // If we don't have the ID yet (e.g. initial Google login token update), retrieve it from the DB
-      if (!token.id && token.email) {
+        token.role = user.role;
+      } else if (token.email) {
         try {
           await dbConnect();
           const dbUser = await User.findOne({ email: token.email.toLowerCase() });
           if (dbUser) {
             token.id = dbUser._id.toString();
+            token.role = dbUser.role || "user";
           }
         } catch (error) {
-          console.error("Error resolving user ID in JWT callback:", error);
+          console.error("Error resolving user ID/role in JWT callback:", error);
         }
       }
       return token;
@@ -100,6 +133,7 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id as string;
+        session.user.role = token.role as string;
       }
       return session;
     },

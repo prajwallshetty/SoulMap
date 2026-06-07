@@ -68,6 +68,11 @@ export default function Navbar() {
                     <PlusCircle className="h-4 w-4 text-[#E8C47A]" />
                     <span>New Report</span>
                   </Link>
+                  {session.user?.role === "admin" && (
+                    <Link href="/admin" className="flex items-center space-x-1.5 text-sm text-zinc-500 hover:text-[#3B0A45] font-medium transition-colors">
+                      <span className="text-[#3B0A45]">Admin Panel</span>
+                    </Link>
+                  )}
                   <div className="flex items-center space-x-3 border-l border-zinc-200 pl-6">
                     {session.user?.image ? (
                       // eslint-disable-next-line @next/next/no-img-element
@@ -172,6 +177,16 @@ export default function Navbar() {
                     <PlusCircle className="h-[18px] w-[18px] text-[#E8C47A]" />
                     <span>New Report</span>
                   </Link>
+                  {session.user?.role === "admin" && (
+                    <Link
+                      href="/admin"
+                      onClick={toggleMobileMenu}
+                      className="flex items-center gap-3 rounded-lg px-3 py-3 text-[15px] font-medium text-[#3B0A45] hover:bg-purple-50 transition-colors"
+                    >
+                      <LayoutDashboard className="h-[18px] w-[18px] text-[#3B0A45]" />
+                      <span className="font-semibold">Admin Panel</span>
+                    </Link>
+                  )}
 
                   {/* User section */}
                   <div className="border-t border-zinc-100 mt-2 pt-3 mx-1">

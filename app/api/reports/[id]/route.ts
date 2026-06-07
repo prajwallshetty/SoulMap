@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { dbConnect } from "@/lib/mongodb";
 import Report from "@/models/Report";
+import { logActivity } from "@/lib/audit";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -75,6 +76,15 @@ export async function DELETE(req: Request, { params }: RouteParams) {
         { status: 404 }
       );
     }
+
+    // Write audit log
+    await logActivity({
+      userId: session.user.id,
+      userEmail: session.user.email || "",
+      action: "report.delete",
+      details: `Deleted birth chart report for ${deletedReport.fullName} (ID: ${id})`,
+      req,
+    });
 
     return NextResponse.json(
       { message: "Report deleted successfully" },
