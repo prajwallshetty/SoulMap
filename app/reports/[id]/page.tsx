@@ -6,7 +6,8 @@ import { useSession } from "next-auth/react";
 import { 
   Calendar, Clock, MapPin, Printer, ArrowLeft, Loader2, 
   User, Compass, Award, Heart, Activity, ShieldAlert,
-  Zap, Target, BookOpen, Sparkles
+  Zap, Target, BookOpen, Sparkles, Briefcase, TrendingUp,
+  CheckCircle2, AlertCircle, XCircle, Building2, Star
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
@@ -32,6 +33,50 @@ interface DoshaData {
   description: string;
   effects: string;
   remedy: string;
+}
+
+interface CareerProfession {
+  rank: number;
+  profession: string;
+  score: number;
+  industry: string;
+  reasoning: string;
+}
+
+interface CareerPotentialDimension {
+  score: number;
+  summary: string;
+}
+
+interface CareerPathRecommendation {
+  verdict: string; // "Highly Recommended" | "Conditionally Recommended" | "Not Recommended"
+  explanation: string;
+}
+
+interface CareerAnalysisData {
+  topProfessions: CareerProfession[];
+  potentials: {
+    business: CareerPotentialDimension;
+    employment: CareerPotentialDimension;
+    leadership: CareerPotentialDimension;
+    creative: CareerPotentialDimension;
+    technical: CareerPotentialDimension;
+    publicInfluence: CareerPotentialDimension;
+  };
+  pathRecommendations: {
+    buildBusiness: CareerPathRecommendation;
+    privateJob: CareerPathRecommendation;
+    governmentService: CareerPathRecommendation;
+    selfEmployed: CareerPathRecommendation;
+    freelancer: CareerPathRecommendation;
+    managementRoles: CareerPathRecommendation;
+  };
+  favorableIndustries: string[];
+  careerTimeline: {
+    growthPhases: string;
+    majorBreakthroughs: string;
+    challenges: string;
+  };
 }
 
 interface ReportData {
@@ -66,6 +111,7 @@ interface ReportData {
       leadershipPotential: string;
       successTimeline: string;
     };
+    careerAnalysis?: CareerAnalysisData;
     finance: {
       wealthPotential: string;
       incomePatterns: string;
@@ -238,7 +284,7 @@ export default function ReportDetailPage({ params }: { params: Promise<{ id: str
     );
   }
 
-  const { basicAnalysis, personality, career, finance, loveMarriage, health, planetAnalysis, dashaAnalysis, yogasDoshas, practicalAdvice } = report.generatedReport;
+  const { basicAnalysis, personality, career, careerAnalysis, finance, loveMarriage, health, planetAnalysis, dashaAnalysis, yogasDoshas, practicalAdvice } = report.generatedReport;
 
   // Calculate scores deterministically for premium visual meters
   const seScore = getScoreFromText(career.softwareEngineeringSuitability);
@@ -306,6 +352,7 @@ export default function ReportDetailPage({ params }: { params: Promise<{ id: str
           <TabsList className="bg-zinc-100 border border-[#E4E4E7] p-1.5 rounded-xl grid grid-cols-3 sm:flex sm:flex-wrap sm:justify-center h-auto shadow-sm gap-1">
             <TabsTrigger value="summary" className="py-2.5 px-2 sm:px-3.5 text-[11px] sm:text-xs font-semibold data-[state=active]:bg-white data-[state=active]:text-[#3B0A45] data-[state=active]:shadow-sm rounded-lg text-zinc-500 hover:text-zinc-900 transition-all text-center">Summary</TabsTrigger>
             <TabsTrigger value="personality" className="py-2.5 px-2 sm:px-3.5 text-[11px] sm:text-xs font-semibold data-[state=active]:bg-white data-[state=active]:text-[#3B0A45] data-[state=active]:shadow-sm rounded-lg text-zinc-500 hover:text-zinc-900 transition-all text-center">Personality</TabsTrigger>
+            <TabsTrigger value="career-analysis" className="py-2.5 px-2 sm:px-3.5 text-[11px] sm:text-xs font-semibold data-[state=active]:bg-white data-[state=active]:text-[#3B0A45] data-[state=active]:shadow-sm rounded-lg text-zinc-500 hover:text-zinc-900 transition-all text-center">Career Analysis</TabsTrigger>
             <TabsTrigger value="career" className="py-2.5 px-2 sm:px-3.5 text-[11px] sm:text-xs font-semibold data-[state=active]:bg-white data-[state=active]:text-[#3B0A45] data-[state=active]:shadow-sm rounded-lg text-zinc-500 hover:text-zinc-900 transition-all text-center">Career</TabsTrigger>
             <TabsTrigger value="love" className="py-2.5 px-2 sm:px-3.5 text-[11px] sm:text-xs font-semibold data-[state=active]:bg-white data-[state=active]:text-[#3B0A45] data-[state=active]:shadow-sm rounded-lg text-zinc-500 hover:text-zinc-900 transition-all text-center">Love</TabsTrigger>
             <TabsTrigger value="planets" className="py-2.5 px-2 sm:px-3.5 text-[11px] sm:text-xs font-semibold data-[state=active]:bg-white data-[state=active]:text-[#3B0A45] data-[state=active]:shadow-sm rounded-lg text-zinc-500 hover:text-zinc-900 transition-all text-center">Planets</TabsTrigger>
@@ -459,7 +506,214 @@ export default function ReportDetailPage({ params }: { params: Promise<{ id: str
             </Card>
           </TabsContent>
 
-          {/* TAB 3: CAREER & FINANCE */}
+          {/* TAB 3: CAREER ANALYSIS (Deep) */}
+          <TabsContent value="career-analysis" className="space-y-6 outline-none">
+            {report.generatedReport.careerAnalysis ? (
+              <>
+                {/* Section 1: Top 10 Professions Ranked */}
+                <Card className="bg-white border border-[#E4E4E7] text-[#18181B] p-6 sm:p-8 rounded-xl shadow-sm">
+                  <CardHeader className="px-0 pt-0">
+                    <CardTitle className="font-serif text-xl text-[#3B0A45] flex items-center gap-2">
+                      <Star className="h-5 w-5 text-[#E8C47A]" /> Top 10 Career Paths — Ranked by Cosmic Suitability
+                    </CardTitle>
+                    <p className="text-xs text-zinc-500 font-light mt-1">Professions ranked from highest to lowest compatibility based on planetary placements, yogas, and dasha cycles.</p>
+                  </CardHeader>
+                  <CardContent className="px-0 pb-0 space-y-3">
+                    {report.generatedReport.careerAnalysis.topProfessions.map((prof) => (
+                      <div key={prof.rank} className="group flex flex-col sm:flex-row sm:items-start gap-4 p-4 rounded-xl border border-[#E4E4E7] hover:border-[#3B0A45]/30 hover:bg-zinc-50/50 transition-all duration-200">
+                        {/* Rank Badge */}
+                        <div className="shrink-0 flex flex-col items-center gap-1">
+                          <div className={`h-10 w-10 rounded-xl flex items-center justify-center text-sm font-bold font-serif shadow-sm ${
+                            prof.rank === 1 ? 'bg-[#E8C47A] text-[#3B0A45]' :
+                            prof.rank === 2 ? 'bg-zinc-300 text-zinc-700' :
+                            prof.rank === 3 ? 'bg-amber-600/80 text-white' :
+                            'bg-zinc-100 text-zinc-500 border border-[#E4E4E7]'
+                          }`}>
+                            #{prof.rank}
+                          </div>
+                        </div>
+                        {/* Profession Details */}
+                        <div className="flex-grow space-y-2">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="font-serif font-bold text-base text-[#18181B]">{prof.profession}</span>
+                            <span className="text-[10px] bg-[#E8C47A]/10 text-[#3B0A45] border border-[#E8C47A]/20 px-2 py-0.5 rounded-full font-semibold uppercase tracking-wide">{prof.industry}</span>
+                          </div>
+                          {/* Score Bar */}
+                          <div className="space-y-1">
+                            <div className="flex items-center justify-between text-[10px] text-zinc-500">
+                              <span className="uppercase tracking-wider font-semibold">Suitability Score</span>
+                              <span className="font-bold text-[#3B0A45] text-xs">{prof.score}/100</span>
+                            </div>
+                            <div className="h-1.5 w-full bg-zinc-100 rounded-full overflow-hidden border border-zinc-200/50">
+                              <div
+                                className="h-full rounded-full transition-all duration-1000 ease-out"
+                                style={{
+                                  width: `${prof.score}%`,
+                                  background: prof.score >= 85 ? 'linear-gradient(90deg, #3B0A45, #7C3AED)' :
+                                              prof.score >= 70 ? 'linear-gradient(90deg, #3B0A45, #9D5B9A)' :
+                                              'linear-gradient(90deg, #71717A, #A1A1AA)'
+                                }}
+                              />
+                            </div>
+                          </div>
+                          <p className="text-xs text-zinc-600 font-light leading-relaxed">{prof.reasoning}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+
+                {/* Section 2: 6 Potential Meters */}
+                <div className="space-y-4">
+                  <h3 className="font-serif text-lg font-bold text-[#18181B] flex items-center gap-2">
+                    <TrendingUp className="h-5 w-5 text-[#3B0A45]" />
+                    Astrological Potential Index
+                  </h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {([
+                      { key: 'business', label: 'Business Potential', icon: <Building2 className="h-4 w-4" /> },
+                      { key: 'employment', label: 'Employment Potential', icon: <Briefcase className="h-4 w-4" /> },
+                      { key: 'leadership', label: 'Leadership Potential', icon: <Star className="h-4 w-4" /> },
+                      { key: 'creative', label: 'Creative Potential', icon: <Sparkles className="h-4 w-4" /> },
+                      { key: 'technical', label: 'Technical Potential', icon: <Zap className="h-4 w-4" /> },
+                      { key: 'publicInfluence', label: 'Public Influence', icon: <Target className="h-4 w-4" /> },
+                    ] as const).map(({ key, label, icon }) => {
+                      const dim = report.generatedReport.careerAnalysis!.potentials[key];
+                      return (
+                        <IndexMeter
+                          key={key}
+                          title={label}
+                          score={dim.score}
+                          description={dim.summary}
+                          icon={icon}
+                        />
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Section 3: Career Path Recommendations */}
+                <Card className="bg-white border border-[#E4E4E7] text-[#18181B] p-6 sm:p-8 rounded-xl shadow-sm">
+                  <CardHeader className="px-0 pt-0">
+                    <CardTitle className="font-serif text-xl text-[#3B0A45] flex items-center gap-2">
+                      <Briefcase className="h-5 w-5" /> Career Path Recommendations
+                    </CardTitle>
+                    <p className="text-xs text-zinc-500 font-light mt-1">Based on your birth chart's planetary strengths and weaknesses, here is how well each career path aligns with your cosmic blueprint.</p>
+                  </CardHeader>
+                  <CardContent className="px-0 pb-0">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {([
+                        { key: 'buildBusiness', label: 'Build a Business' },
+                        { key: 'privateJob', label: 'Private / Corporate Job' },
+                        { key: 'governmentService', label: 'Government Service' },
+                        { key: 'selfEmployed', label: 'Self-Employed' },
+                        { key: 'freelancer', label: 'Freelancing' },
+                        { key: 'managementRoles', label: 'Management / Leadership Roles' },
+                      ] as const).map(({ key, label }) => {
+                        const rec = report.generatedReport.careerAnalysis!.pathRecommendations[key];
+                        const isHighly = rec.verdict.toLowerCase().includes('highly');
+                        const isNot = rec.verdict.toLowerCase().includes('not ');
+                        return (
+                          <div key={key} className={`p-4 rounded-xl border transition-all duration-200 ${
+                            isHighly ? 'border-emerald-200 bg-emerald-50/50' :
+                            isNot ? 'border-red-100 bg-red-50/30' :
+                            'border-amber-200 bg-amber-50/30'
+                          }`}>
+                            <div className="flex items-start gap-2.5 mb-2">
+                              {isHighly ? <CheckCircle2 className="h-4.5 w-4.5 text-emerald-600 shrink-0 mt-0.5" /> :
+                               isNot ? <XCircle className="h-4.5 w-4.5 text-red-500 shrink-0 mt-0.5" /> :
+                               <AlertCircle className="h-4.5 w-4.5 text-amber-600 shrink-0 mt-0.5" />}
+                              <div>
+                                <div className="font-semibold text-xs text-[#18181B]">{label}</div>
+                                <div className={`text-[10px] font-bold uppercase tracking-wider mt-0.5 ${
+                                  isHighly ? 'text-emerald-700' :
+                                  isNot ? 'text-red-600' :
+                                  'text-amber-700'
+                                }`}>{rec.verdict}</div>
+                              </div>
+                            </div>
+                            <p className="text-[11px] text-zinc-600 font-light leading-relaxed">{rec.explanation}</p>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Section 4: Favorable Industries */}
+                <Card className="bg-white border border-[#E4E4E7] text-[#18181B] p-6 sm:p-8 rounded-xl shadow-sm">
+                  <CardHeader className="px-0 pt-0">
+                    <CardTitle className="font-serif text-xl text-[#3B0A45] flex items-center gap-2">
+                      <Building2 className="h-5 w-5" /> Favorable Industries
+                    </CardTitle>
+                    <p className="text-xs text-zinc-500 font-light mt-1">Only industries that are strongly supported by your chart's planetary positions are listed below.</p>
+                  </CardHeader>
+                  <CardContent className="px-0 pb-0">
+                    <div className="flex flex-wrap gap-2">
+                      {report.generatedReport.careerAnalysis.favorableIndustries.map((industry, idx) => (
+                        <span
+                          key={idx}
+                          className="inline-flex items-center gap-1.5 text-sm font-semibold bg-gradient-to-r from-[#3B0A45]/10 to-[#E8C47A]/10 text-[#3B0A45] border border-[#3B0A45]/20 px-4 py-2 rounded-full shadow-sm hover:from-[#3B0A45]/20 hover:border-[#3B0A45]/40 transition-all"
+                        >
+                          <span className="h-1.5 w-1.5 rounded-full bg-[#E8C47A]" />
+                          {industry}
+                        </span>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Section 5: Career Timeline */}
+                <Card className="bg-white border border-[#E4E4E7] text-[#18181B] p-6 sm:p-8 rounded-xl shadow-sm">
+                  <CardHeader className="px-0 pt-0">
+                    <CardTitle className="font-serif text-xl text-[#3B0A45] flex items-center gap-2">
+                      <Calendar className="h-5 w-5" /> Career Timeline & Planetary Periods
+                    </CardTitle>
+                    <p className="text-xs text-zinc-500 font-light mt-1">Key Mahadasha and Antardasha periods that shape your professional journey.</p>
+                  </CardHeader>
+                  <CardContent className="px-0 pb-0">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                      <div className="p-5 rounded-xl bg-emerald-50/50 border border-emerald-200 space-y-2">
+                        <div className="flex items-center gap-2">
+                          <div className="h-7 w-7 rounded-lg bg-emerald-600 flex items-center justify-center">
+                            <TrendingUp className="h-4 w-4 text-white" />
+                          </div>
+                          <span className="text-xs font-bold text-emerald-800 uppercase tracking-wider">Growth Phases</span>
+                        </div>
+                        <p className="text-xs text-zinc-700 font-light leading-relaxed">{report.generatedReport.careerAnalysis.careerTimeline.growthPhases}</p>
+                      </div>
+                      <div className="p-5 rounded-xl bg-[#3B0A45]/5 border border-[#3B0A45]/15 space-y-2">
+                        <div className="flex items-center gap-2">
+                          <div className="h-7 w-7 rounded-lg bg-[#3B0A45] flex items-center justify-center">
+                            <Sparkles className="h-4 w-4 text-[#E8C47A]" />
+                          </div>
+                          <span className="text-xs font-bold text-[#3B0A45] uppercase tracking-wider">Major Breakthroughs</span>
+                        </div>
+                        <p className="text-xs text-zinc-700 font-light leading-relaxed">{report.generatedReport.careerAnalysis.careerTimeline.majorBreakthroughs}</p>
+                      </div>
+                      <div className="p-5 rounded-xl bg-amber-50/50 border border-amber-200 space-y-2">
+                        <div className="flex items-center gap-2">
+                          <div className="h-7 w-7 rounded-lg bg-amber-600 flex items-center justify-center">
+                            <ShieldAlert className="h-4 w-4 text-white" />
+                          </div>
+                          <span className="text-xs font-bold text-amber-800 uppercase tracking-wider">Challenges & Cautions</span>
+                        </div>
+                        <p className="text-xs text-zinc-700 font-light leading-relaxed">{report.generatedReport.careerAnalysis.careerTimeline.challenges}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </>
+            ) : (
+              <div className="rounded-xl border border-[#E4E4E7] bg-white p-12 text-center flex flex-col items-center justify-center min-h-[260px] shadow-sm">
+                <Briefcase className="h-10 w-10 text-zinc-300 mb-4" />
+                <h3 className="font-serif text-base font-bold text-[#18181B] mb-1">Career Analysis Not Available</h3>
+                <p className="text-xs text-zinc-500 font-light max-w-sm">This report was generated before the Career Analysis feature was available. Please generate a new report to access the full career breakdown.</p>
+              </div>
+            )}
+          </TabsContent>
+
+          {/* TAB 4: CAREER & FINANCE (General) */}
           <TabsContent value="career" className="space-y-6 outline-none">
             <Card className="bg-white border border-[#E4E4E7] text-[#18181B] p-6 sm:p-8 space-y-6 rounded-xl shadow-sm">
               <CardHeader className="px-0 pt-0">
@@ -810,10 +1064,94 @@ export default function ReportDetailPage({ params }: { params: Promise<{ id: str
           </div>
         </div>
 
-        {/* 4. Career & Finance */}
+        {/* 4. Career Analysis — Deep (Print) */}
+        {careerAnalysis && (
+          <div className="space-y-4 p-4 border border-gray-300">
+            <h2 className="font-serif text-base font-bold text-[#3B0A45] border-b border-gray-300 pb-1 uppercase">
+              4. Career Analysis — Ranked Professions & Potentials
+            </h2>
+
+            {/* Top Professions Table */}
+            <div>
+              <strong className="text-xs">Top 10 Career Paths (Ranked by Suitability):</strong>
+              <table className="w-full border-collapse border border-gray-300 mt-2 text-[10px]">
+                <thead>
+                  <tr className="bg-gray-100">
+                    <th className="border border-gray-300 p-1.5 text-center w-8">Rank</th>
+                    <th className="border border-gray-300 p-1.5 text-left">Profession</th>
+                    <th className="border border-gray-300 p-1.5 text-left">Industry</th>
+                    <th className="border border-gray-300 p-1.5 text-center w-14">Score</th>
+                    <th className="border border-gray-300 p-1.5 text-left">Astrological Reasoning</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {careerAnalysis.topProfessions.map((prof) => (
+                    <tr key={prof.rank} className="even:bg-gray-50">
+                      <td className="border border-gray-300 p-1.5 text-center font-bold">#{prof.rank}</td>
+                      <td className="border border-gray-300 p-1.5 font-semibold">{prof.profession}</td>
+                      <td className="border border-gray-300 p-1.5 text-gray-600">{prof.industry}</td>
+                      <td className="border border-gray-300 p-1.5 text-center font-bold text-[#3B0A45]">{prof.score}</td>
+                      <td className="border border-gray-300 p-1.5 text-gray-700 text-[9px]">{prof.reasoning}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Potentials */}
+            <div className="pt-2 border-t border-gray-200">
+              <strong className="text-xs">Astrological Potential Index:</strong>
+              <div className="grid grid-cols-3 gap-2 mt-2 text-[10px]">
+                <div className="border border-gray-200 p-2"><strong>Business:</strong> {careerAnalysis.potentials.business.score}% — {careerAnalysis.potentials.business.summary}</div>
+                <div className="border border-gray-200 p-2"><strong>Employment:</strong> {careerAnalysis.potentials.employment.score}% — {careerAnalysis.potentials.employment.summary}</div>
+                <div className="border border-gray-200 p-2"><strong>Leadership:</strong> {careerAnalysis.potentials.leadership.score}% — {careerAnalysis.potentials.leadership.summary}</div>
+                <div className="border border-gray-200 p-2"><strong>Creative:</strong> {careerAnalysis.potentials.creative.score}% — {careerAnalysis.potentials.creative.summary}</div>
+                <div className="border border-gray-200 p-2"><strong>Technical:</strong> {careerAnalysis.potentials.technical.score}% — {careerAnalysis.potentials.technical.summary}</div>
+                <div className="border border-gray-200 p-2"><strong>Public Influence:</strong> {careerAnalysis.potentials.publicInfluence.score}% — {careerAnalysis.potentials.publicInfluence.summary}</div>
+              </div>
+            </div>
+
+            {/* Path Recommendations */}
+            <div className="pt-2 border-t border-gray-200">
+              <strong className="text-xs">Career Path Recommendations:</strong>
+              <div className="grid grid-cols-2 gap-2 mt-2 text-[10px]">
+                {([
+                  { key: 'buildBusiness', label: 'Build a Business' },
+                  { key: 'privateJob', label: 'Private / Corporate Job' },
+                  { key: 'governmentService', label: 'Government Service' },
+                  { key: 'selfEmployed', label: 'Self-Employed' },
+                  { key: 'freelancer', label: 'Freelancing' },
+                  { key: 'managementRoles', label: 'Management Roles' },
+                ] as const).map(({ key, label }) => (
+                  <div key={key} className="border border-gray-200 p-2">
+                    <strong>{label}:</strong>{" "}
+                    <span className="italic text-gray-700">{careerAnalysis.pathRecommendations[key].verdict}</span>
+                    {" — "}{careerAnalysis.pathRecommendations[key].explanation}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Favorable Industries */}
+            <div className="pt-2 border-t border-gray-200 text-[10px]">
+              <strong className="text-xs">Favorable Industries:</strong>{" "}
+              {careerAnalysis.favorableIndustries.join(" • ")}
+            </div>
+
+            {/* Career Timeline */}
+            <div className="pt-2 border-t border-gray-200 text-[10px] space-y-2">
+              <strong className="text-xs">Career Timeline:</strong>
+              <div><strong>Growth Phases:</strong> {careerAnalysis.careerTimeline.growthPhases}</div>
+              <div><strong>Major Breakthroughs:</strong> {careerAnalysis.careerTimeline.majorBreakthroughs}</div>
+              <div><strong>Challenges & Cautions:</strong> {careerAnalysis.careerTimeline.challenges}</div>
+            </div>
+          </div>
+        )}
+
+        {/* 5. Career & Finance */}
         <div className="space-y-4 print-card p-4">
           <h2 className="font-serif text-base font-bold text-[#3B0A45] border-b border-gray-300 pb-1 uppercase">
-            4. Career & Wealth Potentials
+            {careerAnalysis ? "5." : "4."} Career & Wealth Potentials
           </h2>
           <div className="grid grid-cols-2 gap-4 text-xs">
             <div>

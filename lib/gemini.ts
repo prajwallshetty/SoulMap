@@ -82,6 +82,11 @@ STRICT INSTRUCTIONS:
 2. DO NOT include any AI-like disclaimers (e.g. "astrology is for entertainment only", "as a language model, I cannot predict the future", "consult a financial advisor", or "this is not professional medical advice"). If there are challenges, suggest spiritual remedies, mantra recitation, charity, or lifestyle adjustments instead.
 3. Every section must be highly detailed, rich with traditional Sanskrit Jyotish terminology (e.g., Budha, Guru, Shani, Shubha, Ashubha, Rashi, Bhava, Nakshatra, Dasha), and feel personally tailored to this native's specific birth details.
 4. Elaborate on every point. Do not write short summary sentences; provide deep, essay-like paragraphs of cosmic wisdom.
+5. CAREER ANALYSIS RULES (CRITICAL — strictly follow these):
+   - Do NOT assume or default to software engineering / IT unless Budha (Mercury) or Rahu placements CLEARLY and strongly indicate technical aptitude.
+   - Only list industries in "favorableIndustries" that are genuinely and strongly supported by the chart's planetary placements, yogas, and house lords.
+   - Every profession score must be a genuine integer 0–100 based on actual chart strength, not a default value.
+   - The "reasoning" for each profession MUST cite specific planets, houses, nakshatras, and yogas from this particular chart.
 
 Birth Details:
 - Full Name: ${details.fullName}
@@ -98,7 +103,7 @@ You MUST return a JSON object with the exact structure below. Do not wrap it in 
     "moonSign": "Moon Sign / Rashi (e.g., Cancer, Leo)",
     "sunSign": "Sun Sign / Surya Rashi (e.g., Pisces, Scorpio)",
     "nakshatra": "Nakshatra / Birth Star (e.g., Rohini, Ashwini)",
-    "pada": 1, 2, 3 or 4 (integer representation of Nakshatra Pada)
+    "pada": 1
   },
   "personality": {
     "summary": "Detailed overall personality overview based on Lagna and Moon sign (at least 3-4 sentences).",
@@ -115,6 +120,138 @@ You MUST return a JSON object with the exact structure below. Do not wrap it in 
     "businessVsJob": "A comparative analysis between doing business (self-employed) vs a corporate/stable job.",
     "leadershipPotential": "Career-based leadership growth, capability to manage teams.",
     "successTimeline": "Astrological timeline indicating periods of high success, promotions, or career shifts."
+  },
+  "careerAnalysis": {
+    "topProfessions": [
+      {
+        "rank": 1,
+        "profession": "Most suitable specific profession name (e.g., 'Corporate Lawyer', 'Cardiac Surgeon', 'Civil IAS Officer')",
+        "score": 92,
+        "industry": "Industry category (e.g., Law, Finance, Medicine, Media, Spirituality, Politics, etc.)",
+        "reasoning": "3-4 sentence deep Vedic explanation citing specific planets, houses, nakshatras, and yogas from THIS chart that make this profession ideal for the native."
+      },
+      {
+        "rank": 2,
+        "profession": "Second most suitable specific profession name",
+        "score": 87,
+        "industry": "Industry category",
+        "reasoning": "3-4 sentence Vedic reasoning citing specific chart indicators."
+      },
+      {
+        "rank": 3,
+        "profession": "Third most suitable specific profession name",
+        "score": 83,
+        "industry": "Industry category",
+        "reasoning": "3-4 sentence Vedic reasoning citing specific chart indicators."
+      },
+      {
+        "rank": 4,
+        "profession": "Fourth most suitable specific profession name",
+        "score": 79,
+        "industry": "Industry category",
+        "reasoning": "3-4 sentence Vedic reasoning."
+      },
+      {
+        "rank": 5,
+        "profession": "Fifth most suitable specific profession name",
+        "score": 75,
+        "industry": "Industry category",
+        "reasoning": "3-4 sentence Vedic reasoning."
+      },
+      {
+        "rank": 6,
+        "profession": "Sixth most suitable specific profession name",
+        "score": 70,
+        "industry": "Industry category",
+        "reasoning": "3-4 sentence Vedic reasoning."
+      },
+      {
+        "rank": 7,
+        "profession": "Seventh most suitable specific profession name",
+        "score": 65,
+        "industry": "Industry category",
+        "reasoning": "3-4 sentence Vedic reasoning."
+      },
+      {
+        "rank": 8,
+        "profession": "Eighth most suitable specific profession name",
+        "score": 61,
+        "industry": "Industry category",
+        "reasoning": "3-4 sentence Vedic reasoning."
+      },
+      {
+        "rank": 9,
+        "profession": "Ninth most suitable specific profession name",
+        "score": 57,
+        "industry": "Industry category",
+        "reasoning": "3-4 sentence Vedic reasoning."
+      },
+      {
+        "rank": 10,
+        "profession": "Tenth most suitable specific profession name",
+        "score": 52,
+        "industry": "Industry category",
+        "reasoning": "3-4 sentence Vedic reasoning."
+      }
+    ],
+    "potentials": {
+      "business": {
+        "score": 75,
+        "summary": "2-3 sentence genuine assessment of entrepreneurial drive, financial independence instinct, and risk appetite based on 7th house lord, Rahu, and Sun strength in this chart."
+      },
+      "employment": {
+        "score": 80,
+        "summary": "2-3 sentence genuine assessment of suitability for structured corporate or organizational employment based on Saturn, 6th house, and 10th house indicators in this chart."
+      },
+      "leadership": {
+        "score": 70,
+        "summary": "2-3 sentence genuine assessment of natural authority, command presence, and ability to lead others based on Sun, Mars, Jupiter, and 10th house in this chart."
+      },
+      "creative": {
+        "score": 65,
+        "summary": "2-3 sentence genuine assessment of artistic talent, imaginative expression, and creative problem-solving based on Venus, Moon, 5th house, and relevant nakshatras in this chart."
+      },
+      "technical": {
+        "score": 60,
+        "summary": "2-3 sentence genuine assessment of analytical, scientific, and technical aptitude based on Mercury (Budha), Saturn, Rahu, and 3rd/6th house indicators in this chart."
+      },
+      "publicInfluence": {
+        "score": 55,
+        "summary": "2-3 sentence genuine assessment of charisma, public communication, political influence, or mass-media potential based on Sun, Moon, Rahu, Jupiter, and 11th house in this chart."
+      }
+    },
+    "pathRecommendations": {
+      "buildBusiness": {
+        "verdict": "Highly Recommended",
+        "explanation": "2-3 sentences with specific chart evidence (e.g., exalted 7th lord, strong Rahu in 10th, Dhana yogas) supporting or contradicting entrepreneurship for this native."
+      },
+      "privateJob": {
+        "verdict": "Conditionally Recommended",
+        "explanation": "2-3 sentences with chart evidence citing Saturn, 6th house, and employment indicators for this native."
+      },
+      "governmentService": {
+        "verdict": "Conditionally Recommended",
+        "explanation": "2-3 sentences citing Sun strength, 10th house lord, Saturn's role, and Surya's dignity in indicating suitability for government or public sector roles."
+      },
+      "selfEmployed": {
+        "verdict": "Highly Recommended",
+        "explanation": "2-3 sentences with chart evidence for independent practice, consultancy, or self-directed work for this native."
+      },
+      "freelancer": {
+        "verdict": "Not Recommended",
+        "explanation": "2-3 sentences explaining whether the chart supports or contradicts irregular freelance-style income patterns based on Mercury, Rahu, and 3rd house."
+      },
+      "managementRoles": {
+        "verdict": "Highly Recommended",
+        "explanation": "2-3 sentences citing Jupiter, Sun, 10th house strength, and relevant yogas (e.g., Hamsa, Raja yogas) for executive and managerial suitability."
+      }
+    },
+    "favorableIndustries": ["List only 3-7 industries that are GENUINELY and STRONGLY supported by this chart. Choose only from: Technology, Finance, Marketing, Sales, Law, Medicine, Teaching, Consulting, Media, Content Creation, Politics, Spiritual Services, Real Estate, Manufacturing, Hospitality, Trading, Agriculture. Do NOT list an industry unless it is clearly indicated by planetary positions. Do NOT force software engineering."],
+    "careerTimeline": {
+      "growthPhases": "Detailed paragraph (3-5 sentences) citing specific Mahadasha and Antardasha periods with approximate years when the native is likely to experience significant career growth, stability, promotions, and upward momentum based on this chart.",
+      "majorBreakthroughs": "Detailed paragraph (3-5 sentences) citing specific planetary periods, Jupiter transits, or dasha combinations when sudden career breakthroughs, recognition, windfalls, or major professional opportunities are cosmically destined to manifest for this native.",
+      "challenges": "Detailed paragraph (3-5 sentences) citing specific Sade Sati, Shani dasha, malefic transits, or challenging antardasha periods when career setbacks, delays, transitions, or obstacles may occur, along with specific remedies to mitigate their effect."
+    }
   },
   "finance": {
     "wealthPotential": "Vedic wealth potentials (Dhana Yoga effects).",
