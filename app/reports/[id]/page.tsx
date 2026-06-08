@@ -279,7 +279,7 @@ function IndexMeter({ title, score, description, icon }: IndexMeterProps) {
 export default function ReportDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const router = useRouter();
-  const { status } = useSession();
+  const { data: session, status } = useSession();
 
   const [report, setReport] = useState<ReportData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -352,14 +352,25 @@ export default function ReportDetailPage({ params }: { params: Promise<{ id: str
     <div className="mx-auto max-w-7xl px-5 py-6 sm:px-6 sm:py-8 lg:px-8 w-full flex-grow flex flex-col gap-5 sm:gap-6 bg-[#FAFAFA] text-[#18181B]">
       {/* 1. Header Toolbar (Screen only) */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-[#E4E4E7] pb-6 gap-4 no-print">
-        <Button
-          onClick={() => router.push("/dashboard")}
-          variant="ghost"
-          className="text-zinc-500 hover:text-[#18181B] hover:bg-zinc-100 w-fit h-9 text-xs rounded-lg"
-        >
-          <ArrowLeft className="mr-1.5 h-3.5 w-3.5" />
-          Dashboard
-        </Button>
+        {session?.user?.role === "admin" ? (
+          <Button
+            onClick={() => router.push("/admin")}
+            variant="ghost"
+            className="text-zinc-500 hover:text-[#18181B] hover:bg-zinc-100 w-fit h-9 text-xs rounded-lg"
+          >
+            <ArrowLeft className="mr-1.5 h-3.5 w-3.5" />
+            Admin Panel
+          </Button>
+        ) : (
+          <Button
+            onClick={() => router.push("/dashboard")}
+            variant="ghost"
+            className="text-zinc-500 hover:text-[#18181B] hover:bg-zinc-100 w-fit h-9 text-xs rounded-lg"
+          >
+            <ArrowLeft className="mr-1.5 h-3.5 w-3.5" />
+            Dashboard
+          </Button>
+        )}
         <div className="flex gap-3">
           <Button
             onClick={handlePrint}

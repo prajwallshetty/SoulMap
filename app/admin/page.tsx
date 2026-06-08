@@ -23,6 +23,13 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+interface ReportMetaShort {
+  _id: string;
+  fullName: string;
+  dob: string;
+  createdAt: string;
+}
+
 interface UserMeta {
   _id: string;
   name: string;
@@ -30,6 +37,7 @@ interface UserMeta {
   role: string;
   createdAt: string;
   reportCount: number;
+  reports?: ReportMetaShort[];
 }
 
 interface AuditLogEntry {
@@ -54,6 +62,7 @@ export default function AdminPanelPage() {
   const [loadingUsers, setLoadingUsers] = useState(false);
   const [loadingLogs, setLoadingLogs] = useState(false);
   const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
+  const [expandedUserId, setExpandedUserId] = useState<string | null>(null);
   
   // Search & Filter state
   const [userSearch, setUserSearch] = useState("");
@@ -461,79 +470,135 @@ export default function AdminPanelPage() {
                   </thead>
                   <tbody className="divide-y divide-zinc-100 text-xs">
                     {filteredUsers.map((user) => (
-                      <tr key={user._id} className="hover:bg-zinc-50/30">
-                        {/* Name & Email */}
-                        <td className="py-4 px-6">
-                          <div className="font-semibold text-zinc-800">{user.name}</div>
-                          <div className="text-zinc-400 font-light text-[11px]">{user.email}</div>
-                        </td>
-                        {/* Role */}
-                        <td className="py-4 px-6">
-                          <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] font-medium border ${
-                            user.role === "admin"
-                              ? "bg-purple-50 text-[#3B0A45] border-purple-100"
-                              : "bg-zinc-50 text-zinc-600 border-zinc-200"
-                          }`}>
-                            <span className={`h-1.5 w-1.5 rounded-full ${
-                              user.role === "admin" ? "bg-[#3B0A45]" : "bg-zinc-400"
-                            }`} />
-                            {user.role}
-                          </span>
-                        </td>
-                        {/* Charts compiled */}
-                        <td className="py-4 px-6 font-semibold text-zinc-700">
-                          {user.reportCount} {user.reportCount === 1 ? "chart" : "charts"}
-                        </td>
-                        {/* Created At */}
-                        <td className="py-4 px-6 text-zinc-500 font-light">
-                          {new Date(user.createdAt).toLocaleDateString(undefined, {
-                            year: "numeric",
-                            month: "short",
-                            day: "numeric",
-                          })}
-                        </td>
-                        {/* Actions */}
-                        <td className="py-4 px-6 text-right">
-                          <div className="flex gap-2 justify-end">
-                            {/* Toggle Role */}
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              disabled={actionLoadingId !== null || user._id === session?.user?.id}
-                              onClick={() => handleToggleRole(user._id, user.role)}
-                              className="border-zinc-200 text-zinc-600 hover:bg-zinc-50 h-8 text-[11px] rounded-lg px-2"
-                              title={user._id === session?.user?.id ? "Cannot toggle own role" : "Toggle Access Role"}
-                            >
-                              {actionLoadingId === user._id ? (
-                                <Loader2 className="h-3 w-3 animate-spin text-zinc-500" />
-                              ) : (
-                                <>
-                                  <Shield className="h-3 w-3 mr-1 text-zinc-400" />
-                                  Make {user.role === "admin" ? "User" : "Admin"}
-                                </>
-                              )}
-                            </Button>
-                            {/* Delete User */}
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              disabled={actionLoadingId !== null || user._id === session?.user?.id}
-                              onClick={() => handleDeleteUser(user._id, user.email)}
-                              className="text-zinc-400 hover:text-red-600 hover:bg-red-50 h-8 text-[11px] rounded-lg px-2"
-                              title={user._id === session?.user?.id ? "Cannot delete own account" : "Delete User"}
-                            >
-                              {actionLoadingId === user._id ? (
-                                <Loader2 className="h-3 w-3 animate-spin text-red-500" />
-                              ) : (
-                                <>
-                                  <Trash2 className="h-3 w-3 mr-1" />
-                                  Delete
-                                </>
-                              )}
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
+                      <React.Fragment key={user._id}>
+                        <tr className="hover:bg-zinc-50/30">
+                          {/* Name & Email */}
+                          <td className="py-4 px-6">
+                            <div className="font-semibold text-zinc-800">{user.name}</div>
+                            <div className="text-zinc-400 font-light text-[11px]">{user.email}</div>
+                          </td>
+                          {/* Role */}
+                          <td className="py-4 px-6">
+                            <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] font-medium border ${
+                              user.role === "admin"
+                                ? "bg-purple-50 text-[#3B0A45] border-purple-100"
+                                : "bg-zinc-50 text-zinc-600 border-zinc-200"
+                            }`}>
+                              <span className={`h-1.5 w-1.5 rounded-full ${
+                                user.role === "admin" ? "bg-[#3B0A45]" : "bg-zinc-400"
+                              }`} />
+                              {user.role}
+                            </span>
+                          </td>
+                          {/* Charts compiled */}
+                          <td className="py-4 px-6">
+                            {user.reportCount > 0 ? (
+                              <button
+                                onClick={() => setExpandedUserId(expandedUserId === user._id ? null : user._id)}
+                                className="font-semibold text-[#3B0A45] hover:underline flex items-center gap-1 cursor-pointer focus:outline-none"
+                              >
+                                <span>{user.reportCount} {user.reportCount === 1 ? "chart" : "charts"}</span>
+                                <span className="text-[10px] text-zinc-400">
+                                  {expandedUserId === user._id ? "▲" : "▼"}
+                                </span>
+                              </button>
+                            ) : (
+                              <span className="font-light text-zinc-400">0 charts</span>
+                            )}
+                          </td>
+                          {/* Created At */}
+                          <td className="py-4 px-6 text-zinc-500 font-light">
+                            {new Date(user.createdAt).toLocaleDateString(undefined, {
+                              year: "numeric",
+                              month: "short",
+                              day: "numeric",
+                            })}
+                          </td>
+                          {/* Actions */}
+                          <td className="py-4 px-6 text-right">
+                            <div className="flex gap-2 justify-end">
+                              {/* Toggle Role */}
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                disabled={actionLoadingId !== null || user._id === session?.user?.id}
+                                onClick={() => handleToggleRole(user._id, user.role)}
+                                className="border-zinc-200 text-zinc-600 hover:bg-zinc-50 h-8 text-[11px] rounded-lg px-2"
+                                title={user._id === session?.user?.id ? "Cannot toggle own role" : "Toggle Access Role"}
+                              >
+                                {actionLoadingId === user._id ? (
+                                  <Loader2 className="h-3 w-3 animate-spin text-zinc-500" />
+                                ) : (
+                                  <>
+                                    <Shield className="h-3 w-3 mr-1 text-zinc-400" />
+                                    Make {user.role === "admin" ? "User" : "Admin"}
+                                  </>
+                                )}
+                              </Button>
+                              {/* Delete User */}
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                disabled={actionLoadingId !== null || user._id === session?.user?.id}
+                                onClick={() => handleDeleteUser(user._id, user.email)}
+                                className="text-zinc-400 hover:text-red-600 hover:bg-red-50 h-8 text-[11px] rounded-lg px-2"
+                                title={user._id === session?.user?.id ? "Cannot delete own account" : "Delete User"}
+                              >
+                                {actionLoadingId === user._id ? (
+                                  <Loader2 className="h-3 w-3 animate-spin text-red-500" />
+                                ) : (
+                                  <>
+                                    <Trash2 className="h-3 w-3 mr-1" />
+                                    Delete
+                                  </>
+                                )}
+                              </Button>
+                            </div>
+                          </td>
+                        </tr>
+
+                        {expandedUserId === user._id && user.reports && user.reports.length > 0 && (
+                          <tr className="bg-zinc-50/50">
+                            <td colSpan={5} className="py-4 px-6 border-t border-b border-zinc-200">
+                              <div className="space-y-3">
+                                <div className="flex items-center justify-between">
+                                  <h5 className="font-semibold text-[#3B0A45] text-xs uppercase tracking-wider">
+                                    Generated Reports for {user.name}
+                                  </h5>
+                                  <span className="text-[10px] text-zinc-400">
+                                    Click any report to view, print, or download PDF.
+                                  </span>
+                                </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                                  {user.reports.map((report) => (
+                                    <div key={report._id} className="bg-white border border-zinc-200 rounded-lg p-3 shadow-sm flex flex-col justify-between gap-3">
+                                      <div>
+                                        <div className="font-semibold text-zinc-800 text-xs truncate" title={report.fullName}>
+                                          {report.fullName}
+                                        </div>
+                                        <div className="text-[10px] text-zinc-500 font-light mt-0.5">
+                                          Born: {report.dob}
+                                        </div>
+                                        <div className="text-[9px] text-zinc-400 font-light mt-0.5">
+                                          Compiled: {new Date(report.createdAt).toLocaleDateString()}
+                                        </div>
+                                      </div>
+                                      <Link href={`/reports/${report._id}`}>
+                                        <Button
+                                          size="sm"
+                                          className="w-full bg-white border border-zinc-200 hover:bg-zinc-50 text-zinc-700 h-7 text-[10px] font-medium rounded-md flex items-center justify-center gap-1 shadow-sm"
+                                        >
+                                          View & Download
+                                        </Button>
+                                      </Link>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+                      </React.Fragment>
                     ))}
                     {filteredUsers.length === 0 && (
                       <tr>

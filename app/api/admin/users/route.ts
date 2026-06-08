@@ -28,14 +28,18 @@ export async function GET() {
 
     const usersWithReportCount = await Promise.all(
       users.map(async (user) => {
-        const reportCount = await Report.countDocuments({ userId: user._id });
+        const reports = await Report.find(
+          { userId: user._id },
+          { _id: 1, fullName: 1, dob: 1, createdAt: 1 }
+        ).sort({ createdAt: -1 });
         return {
           _id: user._id.toString(),
           name: user.name,
           email: user.email,
           role: user.role,
           createdAt: user.createdAt,
-          reportCount,
+          reportCount: reports.length,
+          reports,
         };
       })
     );

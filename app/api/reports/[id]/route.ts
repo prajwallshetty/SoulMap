@@ -25,11 +25,12 @@ export async function GET(req: Request, { params }: RouteParams) {
 
     await dbConnect();
 
-    // Enforce that users can only fetch their own reports
-    const report = await Report.findOne({
-      _id: id,
-      userId: session.user.id,
-    });
+    // Enforce that users can only fetch their own reports, unless they are admin
+    const query = session.user.role === "admin"
+      ? { _id: id }
+      : { _id: id, userId: session.user.id };
+
+    const report = await Report.findOne(query);
 
     if (!report) {
       return NextResponse.json(
@@ -64,11 +65,12 @@ export async function DELETE(req: Request, { params }: RouteParams) {
 
     await dbConnect();
 
-    // Enforce that users can only delete their own reports
-    const deletedReport = await Report.findOneAndDelete({
-      _id: id,
-      userId: session.user.id,
-    });
+    // Enforce that users can only delete their own reports, unless they are admin
+    const query = session.user.role === "admin"
+      ? { _id: id }
+      : { _id: id, userId: session.user.id };
+
+    const deletedReport = await Report.findOneAndDelete(query);
 
     if (!deletedReport) {
       return NextResponse.json(
