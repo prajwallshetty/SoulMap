@@ -79,6 +79,52 @@ interface CareerAnalysisData {
   };
 }
 
+interface MarriageTimingProb {
+  probability: string;
+  reasoning: string;
+}
+
+interface RelationshipNatureProp {
+  score: number;
+  description: string;
+}
+
+interface MarriageAnalysisData {
+  timingProbabilities: {
+    earlyMarriage: MarriageTimingProb;
+    averageMarriage: MarriageTimingProb;
+    lateMarriage: MarriageTimingProb;
+  };
+  likelyAgeRange: string;
+  confidenceLevel: string;
+  partnerProfile: {
+    personalityTraits: string;
+    careerTendencies: string;
+  };
+  relationshipNature: {
+    romantic: RelationshipNatureProp;
+    practical: RelationshipNatureProp;
+    emotional: RelationshipNatureProp;
+    independent: RelationshipNatureProp;
+  };
+  strengths: string[];
+  challenges: string[];
+  favorablePeriods: {
+    seriousRelationships: string;
+    engagement: string;
+    marriage: string;
+  };
+  cautionPeriods: string;
+  astrologicalReasoning: {
+    seventhHouse: string;
+    venusJupiter: string;
+    darakaraka: string;
+    navamsaD9: string;
+    dashaCycles: string;
+  };
+  remedialAdvice: string;
+}
+
 interface ReportData {
   _id: string;
   fullName: string;
@@ -112,6 +158,7 @@ interface ReportData {
       successTimeline: string;
     };
     careerAnalysis?: CareerAnalysisData;
+    marriageAnalysis?: MarriageAnalysisData;
     finance: {
       wealthPotential: string;
       incomePatterns: string;
@@ -284,12 +331,22 @@ export default function ReportDetailPage({ params }: { params: Promise<{ id: str
     );
   }
 
-  const { basicAnalysis, personality, career, careerAnalysis, finance, loveMarriage, health, planetAnalysis, dashaAnalysis, yogasDoshas, practicalAdvice } = report.generatedReport;
+  const { basicAnalysis, personality, career, careerAnalysis, marriageAnalysis, finance, loveMarriage, health, planetAnalysis, dashaAnalysis, yogasDoshas, practicalAdvice } = report.generatedReport;
 
   // Calculate scores deterministically for premium visual meters
   const seScore = getScoreFromText(career.softwareEngineeringSuitability);
   const entScore = getScoreFromText(career.entrepreneurshipPotential);
   const harmonyScore = getScoreFromText(loveMarriage.compatibilityInsights);
+
+  // Print section numbering logic
+  let printSecIndex = 4;
+  const careerAnalysisIndex = careerAnalysis ? printSecIndex++ : null;
+  const marriageAnalysisIndex = marriageAnalysis ? printSecIndex++ : null;
+  const careerFinanceIndex = printSecIndex++;
+  const loveMarriageIndex = printSecIndex++;
+  const planetsIndex = printSecIndex++;
+  const dashasIndex = printSecIndex++;
+  const practicalAdviceIndex = printSecIndex++;
 
   return (
     <div className="mx-auto max-w-7xl px-5 py-6 sm:px-6 sm:py-8 lg:px-8 w-full flex-grow flex flex-col gap-5 sm:gap-6 bg-[#FAFAFA] text-[#18181B]">
@@ -354,6 +411,7 @@ export default function ReportDetailPage({ params }: { params: Promise<{ id: str
             <TabsTrigger value="personality" className="py-2.5 px-2 sm:px-3.5 text-[11px] sm:text-xs font-semibold data-[state=active]:bg-white data-[state=active]:text-[#3B0A45] data-[state=active]:shadow-sm rounded-lg text-zinc-500 hover:text-zinc-900 transition-all text-center">Personality</TabsTrigger>
             <TabsTrigger value="career-analysis" className="py-2.5 px-2 sm:px-3.5 text-[11px] sm:text-xs font-semibold data-[state=active]:bg-white data-[state=active]:text-[#3B0A45] data-[state=active]:shadow-sm rounded-lg text-zinc-500 hover:text-zinc-900 transition-all text-center">Career Analysis</TabsTrigger>
             <TabsTrigger value="career" className="py-2.5 px-2 sm:px-3.5 text-[11px] sm:text-xs font-semibold data-[state=active]:bg-white data-[state=active]:text-[#3B0A45] data-[state=active]:shadow-sm rounded-lg text-zinc-500 hover:text-zinc-900 transition-all text-center">Career</TabsTrigger>
+            <TabsTrigger value="marriage-analysis" className="py-2.5 px-2 sm:px-3.5 text-[11px] sm:text-xs font-semibold data-[state=active]:bg-white data-[state=active]:text-[#3B0A45] data-[state=active]:shadow-sm rounded-lg text-zinc-500 hover:text-zinc-900 transition-all text-center">Marriage Analysis</TabsTrigger>
             <TabsTrigger value="love" className="py-2.5 px-2 sm:px-3.5 text-[11px] sm:text-xs font-semibold data-[state=active]:bg-white data-[state=active]:text-[#3B0A45] data-[state=active]:shadow-sm rounded-lg text-zinc-500 hover:text-zinc-900 transition-all text-center">Love</TabsTrigger>
             <TabsTrigger value="planets" className="py-2.5 px-2 sm:px-3.5 text-[11px] sm:text-xs font-semibold data-[state=active]:bg-white data-[state=active]:text-[#3B0A45] data-[state=active]:shadow-sm rounded-lg text-zinc-500 hover:text-zinc-900 transition-all text-center">Planets</TabsTrigger>
             <TabsTrigger value="dashas" className="py-2.5 px-2 sm:px-3.5 text-[11px] sm:text-xs font-semibold data-[state=active]:bg-white data-[state=active]:text-[#3B0A45] data-[state=active]:shadow-sm rounded-lg text-zinc-500 hover:text-zinc-900 transition-all text-center">Dashas</TabsTrigger>
@@ -800,6 +858,232 @@ export default function ReportDetailPage({ params }: { params: Promise<{ id: str
             </Card>
           </TabsContent>
 
+          {/* TAB 4: MARRIAGE & RELATIONSHIP ANALYSIS (Deep) */}
+          <TabsContent value="marriage-analysis" className="space-y-6 outline-none">
+            {marriageAnalysis ? (
+              <>
+                {/* Section 1: Timing & Probability Dashboard */}
+                <Card className="bg-white border border-[#E4E4E7] text-[#18181B] p-6 sm:p-8 rounded-xl shadow-sm">
+                  <CardHeader className="px-0 pt-0">
+                    <CardTitle className="font-serif text-xl text-[#3B0A45] flex items-center gap-2">
+                      <Clock className="h-5 w-5 text-[#E8C47A]" /> Marriage Timing & Age Outlook
+                    </CardTitle>
+                    <p className="text-xs text-zinc-500 font-light mt-1">
+                      Probability distributions for marriage timing based on Dasha triggers and planetary accelerations/delays.
+                    </p>
+                  </CardHeader>
+                  <CardContent className="px-0 pb-0 space-y-6">
+                    {/* Probabilities Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      {([
+                        { key: 'earlyMarriage', label: 'Early Marriage', theme: 'emerald' },
+                        { key: 'averageMarriage', label: 'Average Marriage Age', theme: 'purple' },
+                        { key: 'lateMarriage', label: 'Late Marriage', theme: 'amber' }
+                      ] as const).map(({ key, label, theme }) => {
+                        const probData = marriageAnalysis.timingProbabilities[key];
+                        const numericScore = parseInt(probData.probability) || 50;
+                        return (
+                          <div key={key} className="p-4 rounded-xl border border-[#E4E4E7] bg-zinc-50/50 space-y-3">
+                            <div className="flex justify-between items-center">
+                              <span className="text-xs font-semibold text-zinc-700">{label}</span>
+                              <span className="text-base font-bold text-[#3B0A45]">{probData.probability}</span>
+                            </div>
+                            <div className="h-1.5 w-full bg-zinc-100 rounded-full overflow-hidden">
+                              <div
+                                className={`h-full rounded-full ${
+                                  theme === 'emerald' ? 'bg-emerald-600' :
+                                  theme === 'purple' ? 'bg-[#3B0A45]' :
+                                  'bg-amber-600'
+                                }`}
+                                style={{ width: `${numericScore}%` }}
+                              />
+                            </div>
+                            <p className="text-[11px] text-zinc-500 font-light leading-relaxed">{probData.reasoning}</p>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Likely Age & Confidence Indicator */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-zinc-100">
+                      <div className="p-4 rounded-xl bg-zinc-50 border border-[#E4E4E7] flex justify-between items-center">
+                        <div>
+                          <span className="text-[10px] text-zinc-400 font-semibold uppercase tracking-wider block">Most Likely Marriage Age Range</span>
+                          <span className="text-base font-serif font-bold text-[#3B0A45] mt-1 block">{marriageAnalysis.likelyAgeRange}</span>
+                        </div>
+                        <Calendar className="h-8 w-8 text-[#E8C47A]/75 shrink-0" />
+                      </div>
+                      <div className="p-4 rounded-xl bg-zinc-50 border border-[#E4E4E7] flex justify-between items-center">
+                        <div>
+                          <span className="text-[10px] text-zinc-400 font-semibold uppercase tracking-wider block">Prediction Confidence Level</span>
+                          <span className="text-base font-serif font-bold text-[#3B0A45] mt-1 block">{marriageAnalysis.confidenceLevel}</span>
+                        </div>
+                        <Sparkles className="h-8 w-8 text-[#3B0A45]/75 shrink-0" />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Section 2: Partner Profile */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <Card className="bg-white border border-[#E4E4E7] text-[#18181B] p-6 rounded-xl shadow-sm space-y-4">
+                    <div className="flex items-center gap-2 pb-2 border-b border-zinc-100">
+                      <User className="h-5 w-5 text-[#3B0A45]" />
+                      <h3 className="font-serif text-base font-bold text-[#18181B]">Partner Personality & Appearance</h3>
+                    </div>
+                    <p className="text-xs text-zinc-600 font-light leading-relaxed">
+                      {marriageAnalysis.partnerProfile.personalityTraits}
+                    </p>
+                  </Card>
+
+                  <Card className="bg-white border border-[#E4E4E7] text-[#18181B] p-6 rounded-xl shadow-sm space-y-4">
+                    <div className="flex items-center gap-2 pb-2 border-b border-zinc-100">
+                      <Briefcase className="h-5 w-5 text-[#3B0A45]" />
+                      <h3 className="font-serif text-base font-bold text-[#18181B]">Partner Career & Finances</h3>
+                    </div>
+                    <p className="text-xs text-zinc-600 font-light leading-relaxed">
+                      {marriageAnalysis.partnerProfile.careerTendencies}
+                    </p>
+                  </Card>
+                </div>
+
+                {/* Section 3: Relationship Dynamics */}
+                <div className="space-y-4">
+                  <h3 className="font-serif text-lg font-bold text-[#18181B] flex items-center gap-2">
+                    <Heart className="h-5 w-5 text-[#3B0A45]" />
+                    Relationship Harmony Dimensions
+                  </h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {([
+                      { key: 'romantic', label: 'Romantic Connection', icon: <Heart className="h-4 w-4" /> },
+                      { key: 'practical', label: 'Practical Grounding', icon: <Building2 className="h-4 w-4" /> },
+                      { key: 'emotional', label: 'Emotional Depth', icon: <Compass className="h-4 w-4" /> },
+                      { key: 'independent', label: 'Personal Autonomy', icon: <Star className="h-4 w-4" /> },
+                    ] as const).map(({ key, label, icon }) => {
+                      const dim = marriageAnalysis.relationshipNature[key];
+                      return (
+                        <IndexMeter
+                          key={key}
+                          title={label}
+                          score={dim.score}
+                          description={dim.description}
+                          icon={icon}
+                        />
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Section 4: Jyotish Synthesis (Detailed Reasoning) */}
+                <Card className="bg-white border border-[#E4E4E7] text-[#18181B] p-6 sm:p-8 rounded-xl shadow-sm">
+                  <CardHeader className="px-0 pt-0">
+                    <CardTitle className="font-serif text-xl text-[#3B0A45] flex items-center gap-2">
+                      <BookOpen className="h-5 w-5" /> Detailed Jyotish Synthesis
+                    </CardTitle>
+                    <p className="text-xs text-zinc-500 font-light mt-1">
+                      Deep astrological logic showing how specific birth chart indicators shape your marital outcomes.
+                    </p>
+                  </CardHeader>
+                  <CardContent className="px-0 pb-0">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {([
+                        { key: 'seventhHouse', label: '7th House & 7th Lord', summary: marriageAnalysis.astrologicalReasoning.seventhHouse },
+                        { key: 'venusJupiter', label: 'Venus & Jupiter Dignities', summary: marriageAnalysis.astrologicalReasoning.venusJupiter },
+                        { key: 'darakaraka', label: 'Darakaraka Placement', summary: marriageAnalysis.astrologicalReasoning.darakaraka },
+                        { key: 'navamsaD9', label: 'Navamsa (D9) Chart', summary: marriageAnalysis.astrologicalReasoning.navamsaD9 },
+                        { key: 'dashaCycles', label: 'Active Dasha Cycles', summary: marriageAnalysis.astrologicalReasoning.dashaCycles },
+                      ] as const).map(({ key, label, summary }) => (
+                        <div key={key} className="p-4 rounded-xl border border-zinc-100 bg-purple-50/20 space-y-2">
+                          <span className="text-[10px] font-bold text-[#3B0A45] uppercase tracking-wider block">{label}</span>
+                          <p className="text-[11px] text-zinc-600 font-light leading-relaxed">{summary}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Section 5: Strengths, Challenges & Periods */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Strengths & Challenges Card */}
+                  <Card className="bg-white border border-[#E4E4E7] p-6 rounded-xl shadow-sm flex flex-col justify-between">
+                    <div className="space-y-4">
+                      <div>
+                        <h4 className="text-xs font-bold text-emerald-800 uppercase tracking-wider flex items-center gap-1.5 mb-2.5">
+                          <CheckCircle2 className="h-4.5 w-4.5 text-emerald-600" />
+                          Marital Strengths
+                        </h4>
+                        <ul className="space-y-2 text-xs font-light text-zinc-600">
+                          {marriageAnalysis.strengths.map((str, i) => (
+                            <li key={i} className="flex items-start gap-2">
+                              <span className="text-[#E8C47A] font-bold mt-0.5">•</span>
+                              <span className="leading-relaxed">{str}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                      <div className="pt-4 border-t border-zinc-100">
+                        <h4 className="text-xs font-bold text-red-800 uppercase tracking-wider flex items-center gap-1.5 mb-2.5">
+                          <ShieldAlert className="h-4.5 w-4.5 text-red-500" />
+                          Marital Challenges
+                        </h4>
+                        <ul className="space-y-2 text-xs font-light text-zinc-600">
+                          {marriageAnalysis.challenges.map((chal, i) => (
+                            <li key={i} className="flex items-start gap-2">
+                              <span className="text-red-400 font-bold mt-0.5">•</span>
+                              <span className="leading-relaxed">{chal}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  </Card>
+
+                  {/* Favorable & Caution Periods Card */}
+                  <Card className="bg-white border border-[#E4E4E7] p-6 rounded-xl shadow-sm space-y-4">
+                    <h4 className="font-serif text-base font-bold text-[#3B0A45]">Timing Windows & Cautions</h4>
+                    <div className="space-y-3.5 text-xs">
+                      <div className="p-3 rounded-lg bg-emerald-50/40 border border-emerald-100/50">
+                        <span className="font-bold text-emerald-800 text-[10px] uppercase tracking-wider block">Favorable for serious relationships</span>
+                        <p className="text-zinc-600 font-light mt-0.5 leading-relaxed">{marriageAnalysis.favorablePeriods.seriousRelationships}</p>
+                      </div>
+                      <div className="p-3 rounded-lg bg-emerald-50/40 border border-emerald-100/50">
+                        <span className="font-bold text-emerald-800 text-[10px] uppercase tracking-wider block">Favorable for engagement</span>
+                        <p className="text-zinc-600 font-light mt-0.5 leading-relaxed">{marriageAnalysis.favorablePeriods.engagement}</p>
+                      </div>
+                      <div className="p-3 rounded-lg bg-emerald-50/40 border border-emerald-100/50">
+                        <span className="font-bold text-emerald-800 text-[10px] uppercase tracking-wider block">Favorable for marriage ceremony</span>
+                        <p className="text-zinc-600 font-light mt-0.5 leading-relaxed">{marriageAnalysis.favorablePeriods.marriage}</p>
+                      </div>
+                      <div className="p-3 rounded-lg bg-amber-50/50 border border-amber-100">
+                        <span className="font-bold text-amber-800 text-[10px] uppercase tracking-wider block">Caution & Remedy periods</span>
+                        <p className="text-zinc-600 font-light mt-0.5 leading-relaxed">{marriageAnalysis.cautionPeriods}</p>
+                      </div>
+                    </div>
+                  </Card>
+                </div>
+
+                {/* Practical Advice */}
+                <Card className="bg-[#3B0A45]/5 border border-[#3B0A45]/15 text-[#18181B] p-6 sm:p-8 rounded-xl shadow-sm space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="h-5.5 w-5.5 text-[#E8C47A]" />
+                    <span className="font-serif text-base font-bold text-[#3B0A45]">Practical Marital Wisdom & Guidance</span>
+                  </div>
+                  <p className="text-xs text-zinc-700 font-light leading-relaxed">
+                    {marriageAnalysis.remedialAdvice}
+                  </p>
+                </Card>
+              </>
+            ) : (
+              <div className="rounded-xl border border-[#E4E4E7] bg-white p-12 text-center flex flex-col items-center justify-center min-h-[260px] shadow-sm">
+                <Heart className="h-10 w-10 text-zinc-300 mb-4" />
+                <h3 className="font-serif text-base font-bold text-[#18181B] mb-1">Marriage Analysis Not Available</h3>
+                <p className="text-xs text-zinc-500 font-light max-w-sm">
+                  This report was generated before the Marriage & Relationship Analysis feature was available. Please generate a new report to access the full relationship breakdown.
+                </p>
+              </div>
+            )}
+          </TabsContent>
+
           {/* TAB 4: RELATIONSHIPS */}
           <TabsContent value="love" className="space-y-6 outline-none">
             <Card className="bg-white border border-[#E4E4E7] text-[#18181B] p-6 sm:p-8 space-y-6 rounded-xl shadow-sm">
@@ -1068,7 +1352,7 @@ export default function ReportDetailPage({ params }: { params: Promise<{ id: str
         {careerAnalysis && (
           <div className="space-y-4 p-4 border border-gray-300">
             <h2 className="font-serif text-base font-bold text-[#3B0A45] border-b border-gray-300 pb-1 uppercase">
-              4. Career Analysis — Ranked Professions & Potentials
+              {careerAnalysisIndex}. Career Analysis — Ranked Professions & Potentials
             </h2>
 
             {/* Top Professions Table */}
@@ -1151,7 +1435,7 @@ export default function ReportDetailPage({ params }: { params: Promise<{ id: str
         {/* 5. Career & Finance */}
         <div className="space-y-4 print-card p-4">
           <h2 className="font-serif text-base font-bold text-[#3B0A45] border-b border-gray-300 pb-1 uppercase">
-            {careerAnalysis ? "5." : "4."} Career & Wealth Potentials
+            {careerFinanceIndex}. Career & Wealth Potentials
           </h2>
           <div className="grid grid-cols-2 gap-4 text-xs">
             <div>
@@ -1183,10 +1467,129 @@ export default function ReportDetailPage({ params }: { params: Promise<{ id: str
           </div>
         </div>
 
+        {/* Marriage & Relationship Analysis — Deep (Print) */}
+        {marriageAnalysis && (
+          <div className="space-y-4 p-4 border border-gray-300 print-page-break">
+            <h2 className="font-serif text-base font-bold text-[#3B0A45] border-b border-gray-300 pb-1 uppercase">
+              {marriageAnalysisIndex}. Marriage & Relationship Analysis
+            </h2>
+
+            {/* Timing Probabilities */}
+            <div className="grid grid-cols-3 gap-2 text-[10px]">
+              <div className="border border-gray-200 p-2">
+                <strong>Early Marriage Likelihood:</strong> {marriageAnalysis.timingProbabilities.earlyMarriage.probability}
+                <p className="text-[9px] text-gray-600 mt-1">{marriageAnalysis.timingProbabilities.earlyMarriage.reasoning}</p>
+              </div>
+              <div className="border border-gray-200 p-2">
+                <strong>Average Marriage Likelihood:</strong> {marriageAnalysis.timingProbabilities.averageMarriage.probability}
+                <p className="text-[9px] text-gray-600 mt-1">{marriageAnalysis.timingProbabilities.averageMarriage.reasoning}</p>
+              </div>
+              <div className="border border-gray-200 p-2">
+                <strong>Late Marriage Likelihood:</strong> {marriageAnalysis.timingProbabilities.lateMarriage.probability}
+                <p className="text-[9px] text-gray-600 mt-1">{marriageAnalysis.timingProbabilities.lateMarriage.reasoning}</p>
+              </div>
+            </div>
+
+            {/* Likely Age & Confidence */}
+            <div className="grid grid-cols-2 gap-4 text-xs pt-1">
+              <div><strong>Most Likely Marriage Age Range:</strong> {marriageAnalysis.likelyAgeRange}</div>
+              <div><strong>Confidence Level:</strong> {marriageAnalysis.confidenceLevel}</div>
+            </div>
+
+            {/* Partner Profile */}
+            <div className="grid grid-cols-2 gap-4 text-[10px] pt-2 border-t border-gray-200">
+              <div>
+                <strong>Spouse Personality & Traits:</strong>
+                <p className="text-gray-700 mt-1 leading-relaxed">{marriageAnalysis.partnerProfile.personalityTraits}</p>
+              </div>
+              <div>
+                <strong>Spouse Career & Finances:</strong>
+                <p className="text-gray-700 mt-1 leading-relaxed">{marriageAnalysis.partnerProfile.careerTendencies}</p>
+              </div>
+            </div>
+
+            {/* Relationship Harmony Dimensions */}
+            <div className="pt-2 border-t border-gray-200">
+              <strong className="text-xs">Relationship Harmony Dimensions:</strong>
+              <div className="grid grid-cols-4 gap-2 mt-1.5 text-[10px]">
+                <div className="border border-gray-200 p-1.5"><strong>Romantic:</strong> {marriageAnalysis.relationshipNature.romantic.score}% — {marriageAnalysis.relationshipNature.romantic.description}</div>
+                <div className="border border-gray-200 p-1.5"><strong>Practical:</strong> {marriageAnalysis.relationshipNature.practical.score}% — {marriageAnalysis.relationshipNature.practical.description}</div>
+                <div className="border border-gray-200 p-1.5"><strong>Emotional:</strong> {marriageAnalysis.relationshipNature.emotional.score}% — {marriageAnalysis.relationshipNature.emotional.description}</div>
+                <div className="border border-gray-200 p-1.5"><strong>Independent:</strong> {marriageAnalysis.relationshipNature.independent.score}% — {marriageAnalysis.relationshipNature.independent.description}</div>
+              </div>
+            </div>
+
+            {/* Jyotish Synthesis */}
+            <div className="pt-2 border-t border-gray-200">
+              <strong className="text-xs">Vedic Astrological Analysis & Reasoning:</strong>
+              <table className="w-full border-collapse border border-gray-300 mt-1.5 text-[10px]">
+                <thead>
+                  <tr className="bg-gray-100 text-[9px] uppercase">
+                    <th className="border border-gray-300 p-1 text-left w-1/4">Factor</th>
+                    <th className="border border-gray-300 p-1 text-left">Astrological Placement & Analysis</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td className="border border-gray-300 p-1.5 font-bold">7th House & 7th Lord</td>
+                    <td className="border border-gray-300 p-1.5 text-gray-700 text-[9px]">{marriageAnalysis.astrologicalReasoning.seventhHouse}</td>
+                  </tr>
+                  <tr>
+                    <td className="border border-gray-300 p-1.5 font-bold">Venus & Jupiter Signifiers</td>
+                    <td className="border border-gray-300 p-1.5 text-gray-700 text-[9px]">{marriageAnalysis.astrologicalReasoning.venusJupiter}</td>
+                  </tr>
+                  <tr>
+                    <td className="border border-gray-300 p-1.5 font-bold">Darakaraka Placement</td>
+                    <td className="border border-gray-300 p-1.5 text-gray-700 text-[9px]">{marriageAnalysis.astrologicalReasoning.darakaraka}</td>
+                  </tr>
+                  <tr>
+                    <td className="border border-gray-300 p-1.5 font-bold">Navamsa (D9) Chart</td>
+                    <td className="border border-gray-300 p-1.5 text-gray-700 text-[9px]">{marriageAnalysis.astrologicalReasoning.navamsaD9}</td>
+                  </tr>
+                  <tr>
+                    <td className="border border-gray-300 p-1.5 font-bold">Mahadasha / Antardasha Cycles</td>
+                    <td className="border border-gray-300 p-1.5 text-gray-700 text-[9px]">{marriageAnalysis.astrologicalReasoning.dashaCycles}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            {/* Strengths & Challenges */}
+            <div className="grid grid-cols-2 gap-4 text-[10px] pt-2 border-t border-gray-200">
+              <div>
+                <strong>Key Marital Strengths:</strong>
+                <ul className="list-disc pl-4 mt-1 space-y-0.5 text-gray-700">
+                  {marriageAnalysis.strengths.map((s, i) => <li key={i}>{s}</li>)}
+                </ul>
+              </div>
+              <div>
+                <strong>Key Marital Challenges:</strong>
+                <ul className="list-disc pl-4 mt-1 space-y-0.5 text-gray-700">
+                  {marriageAnalysis.challenges.map((c, i) => <li key={i}>{c}</li>)}
+                </ul>
+              </div>
+            </div>
+
+            {/* Timing Windows */}
+            <div className="pt-2 border-t border-gray-200 text-[9px] grid grid-cols-4 gap-2">
+              <div><strong>Relationship Windows:</strong> <p className="text-gray-700 mt-0.5">{marriageAnalysis.favorablePeriods.seriousRelationships}</p></div>
+              <div><strong>Engagement Windows:</strong> <p className="text-gray-700 mt-0.5">{marriageAnalysis.favorablePeriods.engagement}</p></div>
+              <div><strong>Marriage Ceremony Windows:</strong> <p className="text-gray-700 mt-0.5">{marriageAnalysis.favorablePeriods.marriage}</p></div>
+              <div><strong>Cautionary Windows:</strong> <p className="text-gray-700 mt-0.5">{marriageAnalysis.cautionPeriods}</p></div>
+            </div>
+
+            {/* Remedial Advice */}
+            <div className="pt-2 border-t border-gray-200 text-[10px]">
+              <strong>Astrological & Practical Advice:</strong>
+              <p className="text-gray-700 mt-1 leading-relaxed font-light">{marriageAnalysis.remedialAdvice}</p>
+            </div>
+          </div>
+        )}
+
         {/* 5. Relationships */}
         <div className="space-y-2 print-card p-4 print-page-break">
           <h2 className="font-serif text-base font-bold text-[#3B0A45] border-b border-gray-300 pb-1 uppercase">
-            5. Love, Marriage & Relationship Tendencies
+            {loveMarriageIndex}. Love, Marriage & Relationship Tendencies
           </h2>
           <div className="grid grid-cols-2 gap-4 text-xs">
             <div className="col-span-2 border-b border-gray-100 pb-2">
@@ -1207,7 +1610,7 @@ export default function ReportDetailPage({ params }: { params: Promise<{ id: str
         {/* 6. Planetary Positions */}
         <div className="space-y-2 print-card p-4">
           <h2 className="font-serif text-base font-bold text-[#3B0A45] border-b border-gray-300 pb-1 uppercase">
-            6. Detailed Planetary Alignment Positions
+            {planetsIndex}. Detailed Planetary Alignment Positions
           </h2>
           <table className="w-full border-collapse border border-gray-300 mt-2 text-[10px]">
             <thead>
@@ -1236,7 +1639,7 @@ export default function ReportDetailPage({ params }: { params: Promise<{ id: str
         {/* 7. Dashas & Yogas */}
         <div className="space-y-4 print-card p-4 print-page-break">
           <h2 className="font-serif text-base font-bold text-[#3B0A45] border-b border-gray-300 pb-1 uppercase">
-            7. Active Yogas, Doshas & Dashas
+            {dashasIndex}. Active Yogas, Doshas & Dashas
           </h2>
           
           <div className="text-xs">
@@ -1271,7 +1674,7 @@ export default function ReportDetailPage({ params }: { params: Promise<{ id: str
         {/* 8. Practical Advice */}
         <div className="space-y-4 print-card p-4">
           <h2 className="font-serif text-base font-bold text-[#3B0A45] border-b border-gray-300 pb-1 uppercase">
-            8. Remedial Guidance & Practical Wisdom
+            {practicalAdviceIndex}. Remedial Guidance & Practical Wisdom
           </h2>
           <div className="grid grid-cols-2 gap-4 text-[10px]">
             <div className="border border-gray-200 p-2">

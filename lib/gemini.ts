@@ -87,6 +87,10 @@ STRICT INSTRUCTIONS:
    - Only list industries in "favorableIndustries" that are genuinely and strongly supported by the chart's planetary placements, yogas, and house lords.
    - Every profession score must be a genuine integer 0–100 based on actual chart strength, not a default value.
    - The "reasoning" for each profession MUST cite specific planets, houses, nakshatras, and yogas from this particular chart.
+6. MARRIAGE & RELATIONSHIP ANALYSIS RULES (CRITICAL — strictly follow these):
+   - Avoid any generic statements like "You may face challenges" or "You may find love in the future."
+   - Provide clear, specific, chart-based reasoning for every prediction, citing the 7th house, Venus (spouse indicator), Jupiter (marriage guide), Darakaraka (planet with lowest degree in the chart), Navamsa (D9) chart (specifically D9 Lagna, D9 7th house, and D9 7th lord), and active/upcoming Mahadasha/Antardasha cycles.
+   - For timing probabilities, ensure the scores for early, average, and late marriage are realistic and total 100%. Highlight the planetary delay factors (like Saturn aspecting 7th) or acceleration factors (like Jupiter/Venus influence on 7th).
 
 Birth Details:
 - Full Name: ${details.fullName}
@@ -264,6 +268,69 @@ You MUST return a JSON object with the exact structure below. Do not wrap it in 
     "marriageTiming": "Estimated ideal time or upcoming favorable planetary periods for marriage.",
     "partnerCharacteristics": "Traits, personality, and profession prediction of the spouse/partner.",
     "compatibilityInsights": "General advice on choosing a partner and maintaining harmony."
+  },
+  "marriageAnalysis": {
+    "timingProbabilities": {
+      "earlyMarriage": {
+        "probability": "Percentage score (e.g., '15%')",
+        "reasoning": "Detailed 2-3 sentence astrological justification citing chart indicators for early marriage."
+      },
+      "averageMarriage": {
+        "probability": "Percentage score (e.g., '65%')",
+        "reasoning": "Detailed 2-3 sentence astrological justification."
+      },
+      "lateMarriage": {
+        "probability": "Percentage score (e.g., '20%')",
+        "reasoning": "Detailed 2-3 sentence astrological justification highlighting delay factors like Saturn, Ketu, or 8th/12th house placements."
+      }
+    },
+    "likelyAgeRange": "Predicted age range, e.g., '27 - 30 years'.",
+    "confidenceLevel": "High, Medium, or Low based on consistency of indicators.",
+    "partnerProfile": {
+      "personalityTraits": "Detailed analysis (3-4 sentences) of the partner's physical appearance, temperament, strengths, and behavior based on the 7th house, its lord, and Navamsa D9 details.",
+      "careerTendencies": "Detailed analysis (3-4 sentences) of the partner's professional field and financial standing based on the Darakaraka and planetary indicators of the 7th house."
+    },
+    "relationshipNature": {
+      "romantic": {
+        "score": 80,
+        "description": "2-3 sentences explaining romantic intensity based on Venus, 5th house, and D9."
+      },
+      "practical": {
+        "score": 70,
+        "description": "2-3 sentences explaining groundedness and shared duties based on Saturn/Mercury."
+      },
+      "emotional": {
+        "score": 75,
+        "description": "2-3 sentences explaining emotional bond strength based on Moon/4th house."
+      },
+      "independent": {
+        "score": 45,
+        "description": "2-3 sentences explaining personal space and autonomy dynamics in the relationship."
+      }
+    },
+    "strengths": [
+      "Strength 1: Detailed chart-based explanation of a relationship asset.",
+      "Strength 2: Detailed chart-based explanation.",
+      "Strength 3: Detailed chart-based explanation."
+    ],
+    "challenges": [
+      "Challenge 1: Detailed chart-based explanation of potential tension points or planetary afflictions.",
+      "Challenge 2: Detailed chart-based explanation."
+    ],
+    "favorablePeriods": {
+      "seriousRelationships": "Timing description indicating specific Dasha and transit windows.",
+      "engagement": "Timing description.",
+      "marriage": "Timing description."
+    },
+    "cautionPeriods": "Timing description indicating warning periods, transits, or challenging Dashas.",
+    "astrologicalReasoning": {
+      "seventhHouse": "Detailed Vedic reasoning (3-4 sentences) analyzing the 7th house, 7th lord position, and aspects on it.",
+      "venusJupiter": "Detailed Vedic reasoning (3-4 sentences) analyzing Venus and Jupiter's dignity, placement, and impact on marital harmony.",
+      "darakaraka": "Detailed Vedic reasoning (3-4 sentences) analyzing the Darakaraka planet's sign, house, and aspects.",
+      "navamsaD9": "Detailed Vedic reasoning (3-4 sentences) analyzing the Navamsa D9 chart's Lagna, 7th house, and 7th lord position.",
+      "dashaCycles": "Detailed Vedic reasoning (3-4 sentences) analyzing how current and upcoming Mahadasha/Antardasha cycles trigger or delay these relationship outcomes."
+    },
+    "remedialAdvice": "Detailed practical, psychological, and Vedic remedial guidance (4-5 sentences) tailored to the chart to cultivate a harmonious union."
   },
   "health": {
     "generalTendencies": "Vedic physical constitution (Vata/Pitta/Kapha tendencies) and general health overview.",
